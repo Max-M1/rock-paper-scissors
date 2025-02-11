@@ -5,10 +5,7 @@ def sum_numbers():
         print("Будь ласка, введіть число більше або рівне 1.")
         return
 
-    total = 0
-    for i in range(1, n + 1):
-        total += i
-
+    total = sum(i for i in range(1, n + 1))
     print(f"Сума чисел від 1 до {n} дорівнює {total}")
 
 
