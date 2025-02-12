@@ -4,6 +4,11 @@ def find_sum(limit):
 
 # Приклад використання
 if __name__ == "__main__":
-    limit = int(input("Введіть число: "))
-    result = find_sum(limit)
-    print(f"Сума чисел від 1 до {limit}: {result}")
+    try:
+        limit = int(input("Введіть число: "))
+        if limit < 0:
+            raise ValueError("Число повинно бути невід'ємним.")
+        result = find_sum(limit)
+        print(f"Сума чисел від 1 до {limit}: {result}")
+    except ValueError as e:
+        print(f"Помилка: {e}")
