@@ -1,55 +1,81 @@
 import random
 
+"""
+Програма "Камінь-Ножиці-Папір" дозволяє грати проти комп'ютера.
+Гравець вводить свій вибір (Камінь, Папір або Ножиці), після чого
+комп'ютер випадковим чином вибирає свою дію. Програма визначає
+переможця згідно з правилами гри та пропонує зіграти ще раз.
+"""
 
-ACTIONS = {0: "Rock", 1: "Paper", 2: "Scissors"}
-VICTORIES = {
-    "Rock": "Scissors",  # Rock beats scissors
-    "Paper": "Rock",  # Paper beats rock
-    "Scissors": "Paper",  # Scissors beats paper
+# Можливі варіанти дій для гравця та комп'ютера
+ACTIONS: dict[int, str] = {0: "Rock", 1: "Paper", 2: "Scissors"}
+
+# Визначає, які дії перемагають інші
+VICTORIES: dict[str, str] = {
+    "Rock": "Scissors",  # Камінь перемагає ножиці
+    "Paper": "Rock",  # Папір перемагає камінь
+    "Scissors": "Paper",  # Ножиці перемагають папір
 }
 
 
-def get_user_selection(actions):
+def get_user_selection(actions: dict[int, str]) -> str:
+    """
+    Отримує вибір користувача та повертає відповідну дію.
+    Якщо введене значення некоректне, запит повторюється.
+    """
     choices = [f"{actions[action]}[{action}]" for action in actions]
     choices_str = ", ".join(choices)
-    selection = int(input(f"Enter a choice ({choices_str}): "))
-    action = actions[selection]
+
+    try:
+        selection: int = int(
+            input(f"Enter a choice ({choices_str}): ")
+        )  # Отримання вводу від користувача
+        action: str = actions[selection]  # Перетворення вибору у відповідну дію
+        return action
+    except (ValueError, KeyError):  # Обробка некоректного вводу
+        print(f"Invalid selection. Enter a value in range [0, {len(actions) - 1}]")
+        return get_user_selection(actions)  # Повторний запит
+
+
+def get_computer_selection(actions: dict[int, str]) -> str:
+    """
+    Випадковим чином обирає дію для комп'ютера.
+    """
+    selection: int = random.randint(0, len(actions) - 1)  # Генерація випадкового числа
+    action: str = actions[selection]  # Визначення дії відповідно до числа
     return action
 
 
-def get_computer_selection(actions):
-    selection = random.randint(0, len(actions) - 1)
-    action = actions[selection]
-    return action
-
-
-def get_determine_winner(victories, user_action, computer_action):
-    defeats = victories[user_action]
+def determine_winner(
+    victories: dict[str, str], user_action: str, computer_action: str
+) -> str:
+    """
+    Визначає переможця гри, порівнюючи вибір користувача і комп'ютера.
+    """
     if user_action == computer_action:
-        result = f"Both players selected {user_action}. It's a tie!"
-    elif computer_action in defeats:
-        result = f"{user_action} beats {computer_action}! You win!"
+        return f"Both players selected {user_action}. It's a tie!"  # Нічия
+    elif victories[user_action] == computer_action:
+        return f"{user_action} beats {computer_action}! You win!"  # Гравець виграв
     else:
-        result = f"{computer_action} beats {user_action}! You lose."
-    return result
+        return f"{computer_action} beats {user_action}! You lose."  # Комп'ютер виграв
 
 
 if __name__ == "__main__":
     while True:
-        try:
-            user_selection = get_user_selection(ACTIONS)
-            print(user_selection)
-            computer_selection = get_computer_selection(ACTIONS)
-            print(computer_selection)
-            determine_winner = get_determine_winner(
-                VICTORIES, user_selection, computer_selection
-            )
-            print(determine_winner)
-        except:
-            range_str = f"[0, {len(ACTIONS) - 1}]"
-            print(f"Invalid selection. Enter a value in range {range_str}")
-            continue
+        # Отримання вибору гравця та комп'ютера
+        user_selection: str = get_user_selection(ACTIONS)
+        computer_selection: str = get_computer_selection(ACTIONS)
 
-        play_again = input("Play again? (y/n): ")
-        if play_again.lower() != "y":
+        # Виведення вибору
+        print(f"You selected: {user_selection}")
+        print(f"Computer selected: {computer_selection}")
+
+        # Визначення та виведення результату гри
+        result: str = determine_winner(VICTORIES, user_selection, computer_selection)
+        print(result)
+
+        # Перевірка, чи гравець хоче зіграти ще раз
+        play_again: str = input("Play again? (y/n): ").strip().lower()
+        if play_again != "y":  # Якщо відповідь не "y", гра завершується
+            print("Thanks for playing!")
             break
